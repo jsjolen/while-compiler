@@ -35,7 +35,8 @@
   (.fetch t)
   (.store t)
   .noop
-  (.protect list) ;; list of inst
+  (.try list list)
+  (.catch list)
   (.branch list list) (.loop list list)) ;; list of inst
 ;;;;; Compiler
 
@@ -68,7 +69,7 @@
 	 ((.comp stm1 stm2) (append (cs stm1) (cs stm2)))
 	 ((.if test then else) (append (cb test) (list (.branch (cs then) (cs else)))))
 	 ((.while b s) (list (.loop (cb b) (cs s))))
-	 ((.try-catch s1 s2) (append (cs s1) (list (.protect (cs s2)))))))
+	 ((.try-catch s1 s2) (list (.try (cs s1) (cs s2))))))
 (export '(cs ca cb))
 ;;;;; Interpreter
 
@@ -211,13 +212,20 @@
 				       (list .noop)))
 				(cdr (c program)))
 			stack (s program))))
-		 ((.protect s1)
+		 ((.try s1 s2)
+		  (make-program
+		   (if (valid? (s program))
+		       (append s1 (list (.catch s2)) (cdr (c program)))
+		       (cdr (c program)))
+		   (e program)
+		   (s program)))
+		 ((.catch s2)
 		  (make-program
 		   (if (valid? (s program))
 		       (cdr (c program))
-		       (prog1 (append s1 (cdr (c program)))
-			 (setf (valid? (s program)) t)))
-		   (e program) (s program)))))))
+		       (append s2 (cdr (c program))))
+		   (e program)
+		   (s program)))))))
 
 (defun parse-stm (src)
   (omatch while stm () (string->list src)))
