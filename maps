@@ -1,0 +1,88 @@
+    private final static TTExc[][] AND_MAP = {
+        /*             NONE_B  TT      FF      ERR_B   T       B_ANY */
+        /* NONE_B */ { NONE_B, NONE_B, NONE_B, NONE_B, NONE_B, NONE_B },
+        /*     TT */ { NONE_B, TT,     FF,     ERR_B,  T,      ANY_B  },
+        /*     FF */ { NONE_B, FF,     FF,     ERR_B,  T,      ANY_B  },
+        /*  ERR_B */ { NONE_B, ERR_B,  ERR_B,  ERR_B,  ERR_B,  ERR_B  },
+        /*      T */ { NONE_B, T,      T,      ERR_B,  T,      ANY_B  },
+        /*  B_ANY */ { NONE_B, ANY_B,  ANY_B,  ERR_B,  ANY_B,  ANY_B  }
+    };
+    
+    private final static TTExc[] NEG_MAP = {
+        /* NONE_B  TT  FF  ERR_B  T  B_ANY */
+           NONE_B, FF, TT, ERR_B, T, ANY_B
+    };
+    
+    private final static SignExc[][] MULT_MAP = {
+        /*                 NONE_A   NEG       ZERO     POS       ERR_A   NON_POS  NON_ZERO   NON_NEG   Z        ANY_A */
+        /*    NONE_A */  { NONE_A,  NONE_A,   NONE_A,  NONE_A,   NONE_A, NONE_A,  NONE_A,    NONE_A,   NONE_A,  NONE_A },
+        /*       NEG */  { NONE_A,  POS,      ZERO,    NEG,      ERR_A,  NON_NEG, NON_ZERO,  NON_POS,  Z,       ANY_A  },
+        /*      ZERO */  { NONE_A,  ZERO,     ZERO,    ZERO,     ERR_A,  ZERO,    ZERO,      ZERO,     ZERO,    ANY_A  },
+        /*       POS */  { NONE_A,  NEG,      ZERO,    POS,      ERR_A,  NON_POS, NON_ZERO,  NON_NEG,  Z,       ANY_A  },
+        /*     ERR_A */  { NONE_A,  ERR_A,    ERR_A,   ERR_A,    ERR_A,  ERR_A,   ERR_A,     ERR_A,    ERR_A,   ERR_A  },
+        /*   NON_POS */  { NONE_A,  NON_NEG,  ZERO,    NON_POS,  ERR_A,  NON_NEG, Z,         NON_POS,  Z,       ANY_A  },
+        /*  NON_ZERO */  { NONE_A,  NON_ZERO, ZERO,    NON_ZERO, ERR_A,  Z,       NON_ZERO,  Z,        Z,       ANY_A  },
+        /*   NON_NEG */  { NONE_A,  NON_POS,  ZERO,    NON_NEG,  ERR_A,  NON_POS, Z,         NON_NEG,  Z,       ANY_A  },
+        /*         Z */  { NONE_A,  Z,        ZERO,    Z,        ERR_A,  Z,       Z,         Z,        Z,       ANY_A  },
+        /*     ANY_A */  { NONE_A,  ANY_A,    ANY_A,   ANY_A,    ERR_A,  ANY_A,   ANY_A,     ANY_A,    ANY_A,   ANY_A  }
+    };
+    
+    private final static SignExc[][] DIV_MAP = {
+        /*                 NONE_A   NEG       ZERO     POS       ERR_A   NON_POS  NON_ZERO   NON_NEG   Z        ANY_A */
+        /*    NONE_A */  { NONE_A,  NONE_A,   NONE_A,  NONE_A,   NONE_A, NONE_A,  NONE_A,    NONE_A,   NONE_A,  NONE_A },
+        /*       NEG */  { NONE_A,  NON_NEG,  ERR_A,   NON_POS,  ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*      ZERO */  { NONE_A,  ZERO,     ERR_A,   ZERO,     ERR_A,  ANY_A,   ZERO,      ANY_A,    ANY_A,   ANY_A  },
+        /*       POS */  { NONE_A,  NON_POS,  ERR_A,   NON_NEG,  ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*     ERR_A */  { NONE_A,  ERR_A,    ERR_A,   ERR_A,    ERR_A,  ERR_A,   ERR_A,     ERR_A,    ERR_A,   ERR_A  },
+        /*   NON_POS */  { NONE_A,  NON_NEG,  ERR_A,   NON_POS,  ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*  NON_ZERO */  { NONE_A,  Z,        ERR_A,   Z,        ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*   NON_NEG */  { NONE_A,  NON_POS,  ERR_A,   NON_NEG,  ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*         Z */  { NONE_A,  Z,        ERR_A,   Z,        ERR_A,  ANY_A,   Z,         ANY_A,    ANY_A,   ANY_A  },
+        /*     ANY_A */  { NONE_A,  ANY_A,    ERR_A,   ANY_A,    ERR_A,  ANY_A,   ANY_A,     ANY_A,    ANY_A,   ANY_A  }
+    };
+    
+    private final static SignExc[][] ADD_MAP = {
+        /*                 NONE_A   NEG       ZERO      POS       ERR_A   NON_POS  NON_ZERO   NON_NEG   Z         ANY_A */
+        /*    NONE_A */  { NONE_A,  NONE_A,   NONE_A,   NONE_A,   NONE_A, NONE_A,  NONE_A,    NONE_A,   NONE_A,    NONE_A },
+        /*       NEG */  { NONE_A,  NEG,      NEG,      Z,        ERR_A,  NEG,     Z,         Z,        Z,         ANY_A  },
+        /*      ZERO */  { NONE_A,  NEG,      ZERO,     POS,      ERR_A,  NON_POS, NON_ZERO,  NON_NEG,  Z,         ANY_A  },
+        /*       POS */  { NONE_A,  Z,        POS,      POS,      ERR_A,  Z,       Z,         POS,      Z,         ANY_A  },
+        /*     ERR_A */  { NONE_A,  ERR_A,    ERR_A,    ERR_A,    ERR_A,  ERR_A,   ERR_A,     ERR_A,    ERR_A,     ERR_A  },
+        /*   NON_POS */  { NONE_A,  NEG,      NON_POS,  Z,        ERR_A,  NON_POS, Z,         Z,        Z,         ANY_A  },
+        /*  NON_ZERO */  { NONE_A,  Z,        NON_ZERO, Z,        ERR_A,  Z,       Z,         Z,        Z,         ANY_A  },
+        /*   NON_NEG */  { NONE_A,  Z,        NON_NEG,  POS,      ERR_A,  Z,       Z,         NON_NEG,  Z,         ANY_A  },
+        /*         Z */  { NONE_A,  Z,        Z,        Z,        ERR_A,  Z,       Z,         Z,        Z,         ANY_A  },
+        /*     ANY_A */  { NONE_A,  ANY_A,    ANY_A,    ANY_A,    ERR_A,  ANY_A,   ANY_A,     ANY_A,    ANY_A,     ANY_A  }
+    };
+    
+    private final static SignExc[][] SUB_MAP = {
+        /*                 NONE_A   NEG       ZERO      POS      ERR_A   NON_POS  NON_ZERO   NON_NEG   Z          ANY_A */
+        /*    NONE_A */  { NONE_A,  NONE_A,   NONE_A,   NONE_A,  NONE_A, NONE_A,  NONE_A,    NONE_A,   NONE_A,    NONE_A },
+        /*       NEG */  { NONE_A,  Z,        NEG,      NEG,     ERR_A,  Z,       Z,         Z,        Z,         ANY_A  },
+        /*      ZERO */  { NONE_A,  POS,      ZERO,     NEG,     ERR_A,  NON_NEG, NON_ZERO,  NON_POS,  Z,         ANY_A  },
+        /*       POS */  { NONE_A,  POS,      POS,      Z,       ERR_A,  POS,     Z,         Z,        Z,         ANY_A  },
+        /*     ERR_A */  { NONE_A,  ERR_A,    ERR_A,    ERR_A,   ERR_A,  ERR_A,   ERR_A,     ERR_A,    ERR_A,     ERR_A  },
+        /*   NON_POS */  { NONE_A,  POS,      NON_POS,  NEG,     ERR_A,  Z,       Z,         NON_POS,  Z,         ANY_A  },
+        /*  NON_ZERO */  { NONE_A,  Z,        NON_ZERO, Z,       ERR_A,  Z,       Z,         Z,        Z,         ANY_A  },
+        /*   NON_NEG */  { NONE_A,  POS,      NON_NEG,  Z,       ERR_A,  NON_NEG, Z,         Z,        Z,         ANY_A  },
+        /*         Z */  { NONE_A,  Z,        Z,        Z,       ERR_A,  Z,       Z,         Z,        Z,         ANY_A  },
+        /*     ANY_A */  { NONE_A,  ANY_A,    ANY_A,    ANY_A,   ERR_A,  ANY_A,   ANY_A,     ANY_A,    ANY_A,     ANY_A  }
+    };
+
+    
+    private final static TTExc[][] EQ_MAP = {
+        /*                 NONE_A  NEG     ZERO    POS     ERR_A   NON_POS NON_ZERO NON_NEG Z       ANY_A */
+        /*    NONE_A */  { NONE_B, NONE_B, NONE_B, NONE_B, NONE_B, NONE_B, NONE_B,  NONE_B, NONE_B, NONE_B },
+        /*       NEG */  { NONE_B, T,      FF,     FF,     ERR_B,  T,      T,       FF,     T,      ANY_B  },
+        /*      ZERO */  { NONE_B, FF,     TT,     FF,     ERR_B,  T,      FF,      T,      T,      ANY_B  },
+        /*       POS */  { NONE_B, FF,     FF,     T,      ERR_B,  FF,     T,       T,      T,      ANY_B  },
+        /*     ERR_A */  { NONE_B, ERR_B,  ERR_B,  ERR_B,  ERR_B,  ERR_B,  ERR_B,   ERR_B,  ERR_B,  ERR_B  },
+        /*   NON_POS */  { NONE_B, T,      T,      FF,     ERR_B,  T,      T,       T,      T,      ANY_B  },
+        /*  NON_ZERO */  { NONE_B, T,      FF,     T,      ERR_B,  T,      T,       T,      T,      ANY_B  },
+        /*   NON_NEG */  { NONE_B, FF,     T,      T,      ERR_B,  T,      T,       T,      T,      ANY_B  },
+        /*         Z */  { NONE_B, T,      T,      T,      ERR_B,  T,      T,       T,      T,      ANY_B  },
+        /*     ANY_A */  { NONE_B, ANY_B,  ANY_B,  ANY_B,  ERR_B,  ANY_B,  ANY_B,   ANY_B,  ANY_B,  ANY_B  },
+    };    
+
+    };
+    

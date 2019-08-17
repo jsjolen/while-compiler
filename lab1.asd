@@ -3,8 +3,11 @@
 	       :clometa)
   :serial t
   :components ((:file "package")
+	       (:file "abs")
 	       (:file "lab1")
-	       (:file "parser"))
+	       (:file "parser")
+	       (:file "lub")
+	       (:file "pprinter"))
   :in-order-to ((test-op (test-op "lab1/test"))))
 (asdf:defsystem "lab1/test"
   :depends-on ("lab1" "fiveam")

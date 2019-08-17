@@ -64,17 +64,17 @@
 		:-> (char->number d))))
   (kint ()
 	(seq (bind int (int))
-	     :-> (lab1:.num int)))
+	     :-> (lab1:.num  int)))
   (kvariable ()
-       (or (seq
-	    (bind v (kvariable))
-	    (bind l (letter))
-	    :-> (concatenate 'string v (string l)))
-	   (seq (bind l (letter))
-		:-> (string l))))
+	     (or (seq
+		  (bind v (kvariable))
+		  (bind l (letter))
+		  :-> (concatenate 'string v (string l)))
+		 (seq (bind l (letter))
+		      :-> (string l))))
   (kvar ()
-       (seq (bind kvar (kvariable))
-	    :-> (lab1:.ref (intern kvar))))
+	(seq (bind kvar (kvariable))
+	     :-> (lab1:.ref (intern kvar))))
   (arithm-op ()
 	     (or #\+ #\- #\* #\/))
   (arithm ()
@@ -93,10 +93,10 @@
 	   (kvar)))
   (true ()
  	(bind c (seq #\t #\r #\u #\e))
-	:-> lab1:.tt)
+	:-> (.bool t))
   (false ()
 	 (seq #\f #\a #\l #\s #\e)
-	 :-> lab1:.ff)
+	 :-> (.bool  nil))
   (bool-arithm-eq () #\=)
   (bool-arithm-le () (seq #\< #\=))
   (bool-arithm ()
@@ -130,37 +130,37 @@
 	 (false)))
   (stm ()
        (or
-	(seq ; comp
+	(seq				; comp
 	 (bind left (stm))
 	 #\;
 	 (bind right (stm))
 	 :->
-	 (lab1:.comp left right))
-	(seq ; if
+	 (lab1:.comp left right t))
+	(seq				; if
 	 #\i #\f #\Space
 	 (bind b (bool))
 	 #\Space #\t #\h #\e #\n #\Space
 	 (bind then (stm))
 	 #\space #\e #\l #\s #\e #\Space
 	 (bind else (stm))
-	 :-> (lab1:.if b then else))
-	(seq ; while
+	 :-> (lab1:.if b then else t))
+	(seq				; while
 	 #\w #\h #\i #\l #\e #\Space
 	 (bind b (bool))
 	 #\Space #\d #\o #\Space
 	 (bind loop (stm))
-	 :-> (lab1:.while b loop))
-	(seq ; try-catch
+	 :-> (lab1:.while b loop t))
+	(seq				; try-catch
 	 #\t #\r #\y #\Space
 	 (bind s1 (stm))
 	 #\Space #\c #\a #\t #\c #\h #\Space
 	 (bind s2 (stm))
-	 :-> (lab1:.try-catch s1 s2))
-	(seq ; set
+	 :-> (lab1:.try-catch s1 s2 t))
+	(seq				; setabs-tt
 	 (bind left (kvariable))
 	 (seq #\: #\=)
 	 (bind right (arithm))
-	 :-> (lab1:.set (intern left) right))
-	(seq #\s #\k #\i #\p ; skip
-	     :-> lab1:.skip)))
+	 :-> (lab1:.set (intern left) right t))
+	(seq #\s #\k #\i #\p		; skip
+	     :-> (lab1:.skip t))))
   (spaces () #\space))
